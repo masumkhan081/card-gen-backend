@@ -44,7 +44,7 @@ const scrape = async () => {
             currentPage++;
       }
 
-      fs.writeFileSync('books.json', JSON.stringify(allBooks, null, 2));
+      fs.writeFileSync('./static-data/books.json', JSON.stringify(allBooks, null, 2));
 
       console.log('Data saved to books.json');
       await browser.close();
