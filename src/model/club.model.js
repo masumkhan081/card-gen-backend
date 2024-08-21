@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const clubSchema = new Schema(
   {
-    name: {
+    clubName: {
       type: String,
       required: true,
       unique: true,
