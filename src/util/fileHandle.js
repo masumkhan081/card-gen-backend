@@ -42,7 +42,7 @@ const uploadCardImage = multer({
   },
 }).single("cardImage");
 
-const uploadleagueImage = multer({
+const uploadLeagueImage = multer({
   storage: multerStorage(storageMap.league),
   limits: { fileSize: 1000000 }, // 1MB
   fileFilter: function (req, file, cb) {
@@ -51,7 +51,7 @@ const uploadleagueImage = multer({
 }).single("leagueImage");
 
 const uploadClubImage = multer({
-  storage: multerStorage(storageMap.league),
+  storage: multerStorage(storageMap.club),
   limits: { fileSize: 1000000 }, // 1MB
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
@@ -92,5 +92,5 @@ module.exports = {
   uploadCardImage,
   uploadClubImage,
   uploadPlayerImage,
-  uploadleagueImage,
+  uploadLeagueImage,
 };

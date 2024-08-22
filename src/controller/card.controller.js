@@ -3,7 +3,10 @@ const httpStatus = require("http-status");
 const { success_msg, err_msg } = require("../util/responseHandler");
 const { uploadCardImage } = require("../util/fileHandle");
 const Card = require("../model/card.model");
+const fs = require("fs");
 const path = require("path");
+const { promisify } = require("util");
+const unlinkAsync = promisify(fs.unlink);
 //
 async function getCards(req, res) {
   //
@@ -19,33 +22,33 @@ async function getCards(req, res) {
 
 async function createCard(req, res) {
   try {
-    let fileUrl;
+    uploadCardImage(req, res, async (err) => {
+      const cardName = req.body.cardName; 
 
-    const cardName = req.body.cardName;
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: err });
+      }
+      if (!req.file) {
+        return res.status(400).json({ error: "Please send file" });
+      }
 
-    const existence = await Card.findOne({ cardName });
+      const fileUrl = `${req.protocol}://${req.get(
+        "host"
+      )}/public/card-images/${req.file.filename}`;
+      //
+      const existence = await Card.findOne({ cardName });
 
-    if (existence) {
-      res.send({
-        statusCode: httpStatus[409],
-        success: false,
-        message: "A card already exist with this name",
-        data: null,
-      });
-    } else {
-      uploadCardImage(req, res, async (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: err });
-        }
-        if (!req.file) {
-          return res.status(400).json({ error: "Please send file" });
-        }
+      if (existence) {
+        await unlinkAsync(req.file.path);
 
-        fileUrl = `${req.protocol}://${req.get("host")}/public/card-images/${
-          req.file.filename
-        }`;
-
+        res.send({
+          statusCode: httpStatus[409],
+          success: false,
+          message: "A card already exist with this name",
+          data: null,
+        });
+      } else {
         const addResult = await Card.create({
           cardName,
           image: fileUrl,
@@ -56,11 +59,8 @@ async function createCard(req, res) {
           message: "Card saved successfully",
           data: addResult,
         });
-        // res.send(
-        //   `File uploaded successfully! <a href="${fileUrl}">View file</a>  ${playerName}`
-        // );
-      });
-    }
+      }
+    });
   } catch (err) {
     res.send(JSON.stringify(err));
   }

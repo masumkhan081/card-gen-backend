@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 const cors = require("cors");
 const express = require("express");
+const bodyParser = require("body-parser");
 const httpStatus = require("http-status");
 const playerRoutes = require("./routes/player.route");
 const clubRoutes = require("./routes/club.route");
 const countryRoutes = require("./routes/country.route");
 const cardRoutes = require("./routes/card.route");
+const leagueRoutes = require("./routes/league.route");
 
 const path = require("path");
 //
@@ -24,15 +26,11 @@ app.use(
     credentials: true,
   })
 );
-
 //
 app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.urlencoded({ extended: false }));
 app.use("/public", express.static("public"));
-
-// app.use(formidable());
-//
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -43,10 +41,11 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/cards", cardRoutes);
 app.use("/players", playerRoutes);
 app.use("/clubs", clubRoutes);
+app.use("/leagues", leagueRoutes);
 app.use("/countries", countryRoutes);
-app.use("/cards",cardRoutes);
 
 app.use((req, res, next) => {
   res.status(httpStatus.NOT_FOUND).json({

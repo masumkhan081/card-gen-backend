@@ -20,6 +20,6 @@ const cardSchema = new Schema(
   }
 );
 
-const Club = model("cards", cardSchema);
+const Card = model("cards", cardSchema);
 
-module.exports = Club;
+module.exports = Card;

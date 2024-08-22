@@ -1,5 +1,9 @@
 const playerService = require("../services/player.service");
 const { success_msg, err_msg } = require("../util/responseHandler");
+const fs = require("fs");
+const path = require("path");
+const { promisify } = require("util");
+const unlinkAsync = promisify(fs.unlink);
 
 //
 async function getPlayers(req, res) {

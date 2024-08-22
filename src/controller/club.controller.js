@@ -3,6 +3,10 @@ const httpStatus = require("http-status");
 const { success_msg, err_msg } = require("../util/responseHandler");
 const { uploadClubImage } = require("../util/fileHandle");
 const Club = require("../model/club.model");
+const fs = require("fs");
+const path = require("path");
+const { promisify } = require("util");
+const unlinkAsync = promisify(fs.unlink);
 //
 async function getClubs(req, res) {
   //
@@ -18,29 +22,33 @@ async function getClubs(req, res) {
 
 async function createClub(req, res) {
   try {
-    const clubName = req.body.clubName;
-    const existence = await Club.findOne({ clubName });
+    uploadClubImage(req, res, async (err) => {
+      const clubName = req.body.clubName;
 
-    if (existence) {
-      res.send({
-        statusCode: httpStatus[409],
-        success: false,
-        message: "The club already exist",
-        data: null,
-      });
-    } else {
-      uploadClubImage(req, res, async (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: err });
-        }
-        if (!req.file) {
-          return res.status(400).json({ error: "Please send file" });
-        }
-        const fileUrl = `${req.protocol}://${req.get(
-          "host"
-        )}/public/club-images/${req.file.filename}`;
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: err });
+      }
+      if (!req.file) {
+        return res.status(400).json({ error: "Please send file" });
+      }
 
+      const fileUrl = `${req.protocol}://${req.get(
+        "host"
+      )}/public/club-images/${req.file.filename}`;
+      //
+      const existence = await Club.findOne({ clubName });
+
+      if (existence) {
+        await unlinkAsync(req.file.path);
+
+        res.send({
+          statusCode: httpStatus[409],
+          success: false,
+          message: "A club already exist with this name",
+          data: null,
+        });
+      } else {
         const addResult = await Club.create({
           clubName,
           image: fileUrl,
@@ -51,11 +59,8 @@ async function createClub(req, res) {
           message: "Club saved successfully",
           data: addResult,
         });
-        // res.send(
-        //   `File uploaded successfully! <a href="${fileUrl}">View file</a>  ${playerName}`
-        // );
-      });
-    }
+      }
+    });
   } catch (err) {
     res.send(JSON.stringify(err));
   }
