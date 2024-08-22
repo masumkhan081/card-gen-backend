@@ -2,9 +2,9 @@
 const { Schema, model } = require("mongoose");
 const mongoose = require("mongoose");
 
-const countrySchema = new Schema(
+const leagueSchema = new Schema(
   {
-    name: {
+    leagueName: {
       type: String,
       required: true,
       unique: true,
@@ -20,6 +20,6 @@ const countrySchema = new Schema(
   }
 );
 
-const Country = model("countries", countrySchema);
+const League = model("leagues", leagueSchema);
 
-module.exports = Country;
+module.exports = League;

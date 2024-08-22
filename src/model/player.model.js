@@ -10,7 +10,7 @@ const playerSchema = new Schema(
       required: true,
       unique: true,
     },
-    photo: {
+    image: {
       type: String,
       required: true,
     },
@@ -27,7 +27,7 @@ const playerSchema = new Schema(
     position: {
       type: String,
       required: true,
-    }, 
+    },
     overall: {
       type: Number,
     },

@@ -12,7 +12,6 @@ router.get("/", playerController.getPlayers);
 router.post("/", playerController.createPlayer);
 router.patch("/:id", playerController.updatePlayer);
 router.delete("/:id", playerController.deletePlayer);
-
 //
 //
 router.post("/new-player", async (req, res) => {

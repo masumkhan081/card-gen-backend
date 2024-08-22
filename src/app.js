@@ -2,9 +2,11 @@
 const cors = require("cors");
 const express = require("express");
 const httpStatus = require("http-status");
-const playerRoute = require("./routes/player.route");
-const clubRoute = require("./routes/club.route");
-const countryRoute = require("./routes/country.route");
+const playerRoutes = require("./routes/player.route");
+const clubRoutes = require("./routes/club.route");
+const countryRoutes = require("./routes/country.route");
+const cardRoutes = require("./routes/card.route");
+
 const path = require("path");
 //
 const app = express();
@@ -41,9 +43,10 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/players", playerRoute);
-app.use("/clubs", clubRoute);
-app.use("/countries", countryRoute);
+app.use("/players", playerRoutes);
+app.use("/clubs", clubRoutes);
+app.use("/countries", countryRoutes);
+app.use("/cards",cardRoutes);
 
 app.use((req, res, next) => {
   res.status(httpStatus.NOT_FOUND).json({

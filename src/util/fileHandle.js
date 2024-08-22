@@ -6,12 +6,11 @@ const path = require("path");
 const storageMap = {
   card: "../../public/card-images",
   player: "../../public/player-images",
+  league: "../../public/league-images",
   test: "../../public/test-images",
 };
 
 function multerStorage(location) {
-  console.log(path.join(__dirname, location));
-
   return multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, path.join(__dirname, location)); // Save files to public/upload
@@ -20,7 +19,6 @@ function multerStorage(location) {
       const timestamp = Date.now();
       const ext = path.extname(file.originalname);
       const basename = path.basename(file.originalname, ext);
-
       cb(null, `${basename}-${timestamp}${ext}`);
     },
   });
@@ -41,6 +39,14 @@ const uploadCardImage = multer({
     checkFileType(file, cb);
   },
 }).single("cardImage");
+
+const leagueCardImage = multer({
+  storage: multerStorage(storageMap.league),
+  limits: { fileSize: 1000000 }, // 1MB
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+}).single("leagueImage");
 
 const uploadMultiple = multer({
   storage: multerStorage(storageMap.test),

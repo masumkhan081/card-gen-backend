@@ -9,7 +9,7 @@ const clubSchema = new Schema(
       required: true,
       unique: true,
     },
-    photo: {
+    image: {
       type: String,
     },
   },
