@@ -5,28 +5,23 @@ const mongoose = require("mongoose");
 
 const playerSchema = new Schema(
   {
-    name: {
+    playerName: {
       type: String,
       required: true,
-      unique: true,
     },
     image: {
       type: String,
-      required: true,
     },
     club: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "clubs",
-      required: true,
     },
     nationality: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "countries",
-      required: true,
     },
     position: {
       type: String,
-      required: true,
     },
     overall: {
       type: Number,
@@ -36,19 +31,15 @@ const playerSchema = new Schema(
     },
     pass: {
       type: Number,
-      required: false,
     },
     shot: {
       type: Number,
-      required: false,
     },
     tackling: {
       type: Number,
-      required: false,
     },
     speed: {
       type: Number,
-      required: false,
     },
   },
   {

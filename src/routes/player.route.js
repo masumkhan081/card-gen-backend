@@ -12,8 +12,10 @@ router.get("/", playerController.getPlayers);
 router.post("/", playerController.createPlayer);
 router.patch("/:id", playerController.updatePlayer);
 router.delete("/:id", playerController.deletePlayer);
+
 //
 //
+
 router.post("/new-player", async (req, res) => {
   try {
     let fileUrl, playerName;
@@ -45,25 +47,6 @@ router.post("/new-player", async (req, res) => {
   } catch (err) {
     res.send(JSON.stringify(err));
   }
-});
-
-router.post("/new-card", (req, res) => {
-  uploadCardImage(req, res, (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: err });
-    }
-    if (!req.file) {
-      return res.status(400).json({ error: "Please send file" });
-    }
-
-    const fileUrl = `${req.protocol}://${req.get("host")}/public/card-images/${
-      req.file.filename
-    }`;
-    res.send(
-      `File uploaded successfully! <a href="${fileUrl}">View file</a>  ${req.body.playerName}`
-    );
-  });
 });
 
 module.exports = router;
