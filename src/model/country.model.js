@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const countrySchema = new Schema(
   {
-    name: {
+    countryName: {
       type: String,
       required: true,
       unique: true,

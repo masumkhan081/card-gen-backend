@@ -7,6 +7,8 @@ const storageMap = {
   card: "../../public/card-images",
   player: "../../public/player-images",
   league: "../../public/league-images",
+  club: "../../public/club-images",
+  country: "../../public/country-images",
   test: "../../public/test-images",
 };
 
@@ -40,13 +42,29 @@ const uploadCardImage = multer({
   },
 }).single("cardImage");
 
-const leagueCardImage = multer({
+const uploadleagueImage = multer({
   storage: multerStorage(storageMap.league),
   limits: { fileSize: 1000000 }, // 1MB
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
   },
 }).single("leagueImage");
+
+const uploadClubImage = multer({
+  storage: multerStorage(storageMap.league),
+  limits: { fileSize: 1000000 }, // 1MB
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+}).single("clubImage");
+
+const uploadCountryImage = multer({
+  storage: multerStorage(storageMap.country),
+  limits: { fileSize: 1000000 }, // 1MB
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+}).single("countryImage");
 
 const uploadMultiple = multer({
   storage: multerStorage(storageMap.test),
@@ -70,6 +88,9 @@ function checkFileType(file, cb) {
 
 module.exports = {
   uploadMultiple,
+  uploadCountryImage,
   uploadCardImage,
+  uploadClubImage,
   uploadPlayerImage,
+  uploadleagueImage,
 };

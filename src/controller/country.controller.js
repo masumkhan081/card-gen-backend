@@ -1,7 +1,8 @@
 const countryService = require("../services/country.service");
 const httpStatus = require("http-status");
 const { success_msg, err_msg } = require("../util/responseHandler");
-
+const Country = require("../model/country.model");
+const { uploadCountryImage } = require("../util/fileHandle");
 //
 async function getCountries(req, res) {
   //
@@ -16,8 +17,48 @@ async function getCountries(req, res) {
 }
 
 async function createCountry(req, res) {
-  const result = await countryService.createCountry(req.body);
-  res.send(result);
+  try {
+    const countryName = req.body.countryName;
+    const existence = await Club.findOne({ countryName });
+
+    if (existence) {
+      res.send({
+        statusCode: httpStatus[409],
+        success: false,
+        message: "The country already enlisted",
+        data: null,
+      });
+    } else {
+      uploadCountryImage(req, res, async (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: err });
+        }
+        if (!req.file) {
+          return res.status(400).json({ error: "Please send file" });
+        }
+        const fileUrl = `${req.protocol}://${req.get(
+          "host"
+        )}/public/country-images/${req.file.filename}`;
+
+        const addResult = await Club.create({
+          countryName,
+          image: fileUrl,
+        });
+        res.send({
+          statusCode: httpStatus[201],
+          success: true,
+          message: "Country added successfully",
+          data: addResult,
+        });
+        // res.send(
+        //   `File uploaded successfully! <a href="${fileUrl}">View file</a>  ${playerName}`
+        // );
+      });
+    }
+  } catch (err) {
+    res.send(JSON.stringify(err));
+  }
 }
 //
 async function updateCountry(req, res) {
