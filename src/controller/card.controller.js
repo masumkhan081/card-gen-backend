@@ -8,6 +8,21 @@ const path = require("path");
 const { promisify } = require("util");
 const unlinkAsync = promisify(fs.unlink);
 //
+
+
+async function getCardsAll(req, res) {
+  //
+  const result = await cardService.getCardsAll();
+  //
+  res.send({
+    statusCode: result ? 200 : 404,
+    success: result ? true : false,
+    message: result ? success_msg.fetch("Cards") : err_msg.no_data,
+    data: result,
+  });
+}
+
+
 async function getCards(req, res) {
   //
   const result = await cardService.getCards(req.query);
@@ -81,6 +96,7 @@ async function deleteCard(req, res) {
 
 module.exports = {
   getCards,
+  getCardsAll,
   createCard,
   updateCard,
   deleteCard,

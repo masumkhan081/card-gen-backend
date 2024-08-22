@@ -8,6 +8,17 @@ const {
   getUpdateResponse,
 } = require("../util/responseHandler");
 
+async function getCardsAll() {
+  const fetchResult = await Card.find().skip(0).limit(0);
+  const total = await Card.countDocuments();
+  return {
+    meta: {
+      total,
+    },
+    data: fetchResult,
+  };
+}
+
 async function getCards(query) {
   const {
     currentPage,
@@ -17,14 +28,14 @@ async function getCards(query) {
     sortOrder,
     filterConditions,
     sortConditions,
-  } = getSearchAndPagination({ query, what: operableEntities.Club });
+  } = getSearchAndPagination({ query, what: operableEntities.Card });
 
-  const fetchResult = await Club.find(filterConditions)
+  const fetchResult = await Card.find(filterConditions)
     .sort(sortConditions)
     .skip(viewSkip)
     .limit(viewLimit);
 
-  const total = await Club.countDocuments(filterConditions);
+  const total = await Card.countDocuments(filterConditions);
   return {
     meta: {
       total,
@@ -40,7 +51,7 @@ async function getCards(query) {
 
 async function createCard(data) {
   try {
-    const addResult = await Club.create(data);
+    const addResult = await Card.create(data);
     return getCreateResponse({
       data: addResult,
       what: operableEntities.club,
@@ -52,7 +63,7 @@ async function createCard(data) {
 
 async function updateCard({ id, data }) {
   try {
-    const editResult = await Club.findByIdAndUpdate(id, data, {
+    const editResult = await Card.findByIdAndUpdate(id, data, {
       new: true,
     });
     return getUpdateResponse({
@@ -66,7 +77,7 @@ async function updateCard({ id, data }) {
 //
 async function deleteCard(id) {
   try {
-    const deleteResult = await Club.findByIdAndDelete(id);
+    const deleteResult = await Card.findByIdAndDelete(id);
     return getDeletionResponse({
       data: deleteResult,
       what: operableEntities.club,
@@ -76,4 +87,4 @@ async function deleteCard(id) {
   }
 }
 
-module.exports = { getCards, createCard, deleteCard, updateCard };
+module.exports = { getCards, getCardsAll, createCard, deleteCard, updateCard };
