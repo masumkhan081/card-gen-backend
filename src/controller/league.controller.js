@@ -8,6 +8,19 @@ const path = require("path");
 const { promisify } = require("util");
 const unlinkAsync = promisify(fs.unlink);
 //
+
+async function getLeaguesAll(req, res) {
+  //
+  const result = await leagueService.getLeaguesAll();
+  //
+  res.send({
+    statusCode: result ? 200 : 404,
+    success: result ? true : false,
+    message: result ? success_msg.fetch("Leagues") : err_msg.no_data,
+    data: result,
+  });
+}
+
 async function getLeagues(req, res) {
   //
   const result = await leagueService.getLeagues(req.query);
@@ -81,6 +94,7 @@ async function deleteLeague(req, res) {
 
 module.exports = {
   getLeagues,
+  getLeaguesAll,
   createLeague,
   updateLeague,
   deleteLeague,

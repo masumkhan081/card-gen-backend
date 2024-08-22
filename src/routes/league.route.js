@@ -5,6 +5,8 @@ const leagueController = require("../controller/league.controller");
 const validateRequest = require("../middlewares/validateRequest");
 //
 router.get("/", leagueController.getLeagues);
+router.get("/all", leagueController.getLeaguesAll);
+
 // router.post("/", validateRequest(playerSchema), leagueController.createPlayer);
 router.post("/", leagueController.createLeague);
 router.patch("/:id", leagueController.updateLeague);

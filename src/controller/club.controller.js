@@ -8,6 +8,20 @@ const path = require("path");
 const { promisify } = require("util");
 const unlinkAsync = promisify(fs.unlink);
 //
+
+async function getClubsAll(req, res) {
+  //
+  const result = await clubService.getClubsAll();
+  //
+  res.send({
+    statusCode: result ? 200 : 404,
+    success: result ? true : false,
+    message: result ? success_msg.fetch("Clubs") : err_msg.no_data,
+    data: result,
+  });
+}
+
+//
 async function getClubs(req, res) {
   //
   const result = await clubService.getClubs(req.query);
@@ -81,6 +95,7 @@ async function deleteClub(req, res) {
 
 module.exports = {
   getClubs,
+  getClubsAll,
   createClub,
   updateClub,
   deleteClub,

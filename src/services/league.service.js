@@ -7,6 +7,24 @@ const {
   getDeletionResponse,
   getUpdateResponse,
 } = require("../util/responseHandler");
+// 
+
+
+// 
+
+async function getLeaguesAll() {
+  const fetchResult = await League.find().skip(0).limit(0);
+  const total = await League.countDocuments();
+  return {
+    meta: {
+      total,
+    },
+    data: fetchResult,
+  };
+}
+// 
+
+// 
 
 async function getLeagues(query) {
   const {
@@ -76,4 +94,4 @@ async function deleteLeague(id) {
   }
 }
 
-module.exports = { getLeagues, createLeague, deleteLeague, updateLeague };
+module.exports = { getLeagues,getLeaguesAll, createLeague, deleteLeague, updateLeague };

@@ -5,6 +5,8 @@ const countrySchema = require("../validate/country.validate");
 const validateRequest = require("../middlewares/validateRequest");
 
 router.get("/", countryController.getCountries);
+router.get("/all", countryController.getCountriesAll);
+
 // router.post("/", validateRequest(playerSchema), countryController.createPlayer);
 router.post("/", countryController.createCountry);
 router.patch("/:id", countryController.updateCountry);

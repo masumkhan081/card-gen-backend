@@ -7,6 +7,18 @@ const {
   getDeletionResponse,
   getUpdateResponse,
 } = require("../util/responseHandler");
+// 
+
+async function getClubsAll() {
+  const fetchResult = await Club.find().skip(0).limit(0);
+  const total = await Club.countDocuments();
+  return {
+    meta: {
+      total,
+    },
+    data: fetchResult,
+  };
+}
 
 async function getClubs(query) {
   const {
@@ -76,4 +88,4 @@ async function deleteClub(id) {
   }
 }
 
-module.exports = { getClubs, createClub, deleteClub, updateClub };
+module.exports = { getClubs,getClubsAll, createClub, deleteClub, updateClub };

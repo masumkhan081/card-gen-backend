@@ -5,6 +5,7 @@ const clubSchema = require("../validate/club.validate");
 const validateRequest = require("../middlewares/validateRequest");
 
 router.get("/", clubController.getClubs);
+router.get("/all", clubController.getClubsAll);
 // router.post("/", validateRequest(playerSchema), clubController.createPlayer);
 router.post("/", clubController.createClub);
 router.patch("/:id", clubController.updateClub);

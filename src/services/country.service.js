@@ -7,6 +7,19 @@ const {
   getDeletionResponse,
   getUpdateResponse,
 } = require("../util/responseHandler");
+// 
+
+async function getCountriesAll() {
+  const fetchResult = await Country.find().skip(0).limit(0);
+  const total = await Country.countDocuments();
+  return {
+    meta: {
+      total,
+    },
+    data: fetchResult,
+  };
+}
+// 
 
 async function getCountries(query) {
   const {
@@ -76,4 +89,4 @@ async function deleteCountry(id) {
   }
 }
 
-module.exports = { getCountries, createCountry, updateCountry, deleteCountry };
+module.exports = { getCountries,getCountriesAll, createCountry, updateCountry, deleteCountry };

@@ -9,7 +9,6 @@ const { promisify } = require("util");
 const unlinkAsync = promisify(fs.unlink);
 //
 
-
 async function getCardsAll(req, res) {
   //
   const result = await cardService.getCardsAll();
@@ -21,7 +20,6 @@ async function getCardsAll(req, res) {
     data: result,
   });
 }
-
 
 async function getCards(req, res) {
   //
@@ -38,7 +36,7 @@ async function getCards(req, res) {
 async function createCard(req, res) {
   try {
     uploadCardImage(req, res, async (err) => {
-      const cardName = req.body.cardName; 
+      const cardName = req.body.cardName;
 
       if (err) {
         console.error(err);

@@ -8,6 +8,19 @@ const path = require("path");
 const { promisify } = require("util");
 const unlinkAsync = promisify(fs.unlink);
 //
+
+async function getCountriesAll(req, res) {
+  //
+  const result = await countryService.getCountriesAll();
+  //
+  res.send({
+    statusCode: result ? 200 : 404,
+    success: result ? true : false,
+    message: result ? success_msg.fetch("Country") : err_msg.no_data,
+    data: result,
+  });
+}
+
 async function getCountries(req, res) {
   //
   const result = await countryService.getCountries(req.query);
@@ -19,6 +32,7 @@ async function getCountries(req, res) {
     data: result,
   });
 }
+//
 
 async function createCountry(req, res) {
   try {
@@ -86,6 +100,7 @@ async function deleteCountry(req, res) {
 
 module.exports = {
   getCountries,
+  getCountriesAll,
   createCountry,
   updateCountry,
   deleteCountry,
