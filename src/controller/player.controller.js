@@ -12,7 +12,6 @@ const unlinkAsync = promisify(fs.unlink);
 async function getPlayers(req, res) {
   //
   const result = await playerService.getPlayers(req.query);
-  console.log(result.data.length + "result.data: " + typeof result.data);
   //
   res.send({
     statusCode: result.data.length > 0 ? 200 : 404,
@@ -37,8 +36,6 @@ async function createPlayer(req, res) {
         club,
         nationality,
       } = req.body;
-
-      console.log("info:  " + playerName, shot, pass, dribbling, speed);
 
       if (err) {
         console.error(err);

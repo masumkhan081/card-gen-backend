@@ -12,18 +12,51 @@ const playerSchema = new Schema(
     image: {
       type: String,
     },
-    club: {
+    overall: {
+      type: Number,
+    },
+    rarity: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "clubs",
+      ref: "cards",
     },
     nationality: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "countries",
     },
+    league: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "leagues",
+    },
+    foot: {
+      type: String,
+      enum: ["L", "R"],
+    },
+    skillMoves: {
+      type: Number,
+      enum: [1, 2, 3, 4, 5],
+    },
+    weakFoot: {
+      type: Number,
+      enum: [1, 2, 3, 4, 5],
+    },
+    atkWorkrate: {
+      type: String,
+      enum: ["H", "M", "L"],
+    },
+    defWorkrate: {
+      type: String,
+      enum: ["H", "M", "L"],
+    },
     position: {
       type: String,
     },
-    overall: {
+    playStyle: {
+      type: String,
+    },
+    altPosition: {
+      type: String,
+    },
+    pace: {
       type: Number,
     },
     dribbling: {
@@ -35,11 +68,15 @@ const playerSchema = new Schema(
     shot: {
       type: Number,
     },
-    tackling: {
+    defense: {
       type: Number,
     },
-    speed: {
+    physical: {
       type: Number,
+    },
+    club: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "clubs",
     },
   },
   {
