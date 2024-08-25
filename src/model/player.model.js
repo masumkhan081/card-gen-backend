@@ -51,10 +51,10 @@ const playerSchema = new Schema(
       type: String,
     },
     playStyle: {
-      type: String,
+      type: [String],
     },
     altPosition: {
-      type: String,
+      type: [String],
     },
     pace: {
       type: Number,
