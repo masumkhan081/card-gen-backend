@@ -41,8 +41,6 @@ async function createCountry(req, res) {
     uploadCountryImage(req, res, async (err) => {
       const countryName = req.body.countryName;
 
-      console.log("countryName: " + countryName);
-
       if (err) {
         console.error(err);
         return res.status(500).json({ error: err });

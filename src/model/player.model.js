@@ -73,11 +73,7 @@ const playerSchema = new Schema(
     },
     physical: {
       type: Number,
-    },
-    club: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "clubs",
-    },
+    }, 
   },
   {
     timestamps: true,

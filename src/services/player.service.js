@@ -22,7 +22,11 @@ async function getPlayers(query) {
   const fetchResult = await Player.find(filterConditions)
     .sort(sortConditions)
     .skip(viewSkip)
-    .limit(viewLimit);
+    .limit(viewLimit)
+    .populate("rarity")
+    .populate("nationality")
+    .populate("league")
+    .populate("club");
 
   const total = await Player.countDocuments(filterConditions);
   return {
