@@ -8,6 +8,7 @@ const { uploadPlayerImage, uploadCardImage } = require("../util/fileHandle");
 const Club = require("../model/club.model");
 
 router.get("/", playerController.getPlayers);
+router.get("/:id", playerController.getPlayer);
 //  validateRequest(playerSchema)
 router.post("/", playerController.createPlayer);
 router.patch("/:id", playerController.updatePlayer);

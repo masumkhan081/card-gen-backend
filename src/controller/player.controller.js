@@ -22,6 +22,19 @@ async function getPlayers(req, res) {
   });
 }
 
+async function getPlayer(req, res) {
+  console.log("on this id:");
+  //
+  const result = await playerService.getPlayer(req.params.id);
+  //
+  res.send({
+    statusCode: result ? 200 : 404,
+    success: result ? true : false,
+    message: result ? success_msg.fetch("Player") : err_msg.no_data,
+    data: result,
+  });
+}
+
 async function createPlayer(req, res) {
   try {
     uploadPlayerImage(req, res, async (err) => {
@@ -139,6 +152,7 @@ async function deletePlayer(req, res) {
 
 module.exports = {
   getPlayers,
+  getPlayer,
   createPlayer,
   updatePlayer,
   deletePlayer,

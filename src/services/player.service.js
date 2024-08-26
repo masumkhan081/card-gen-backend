@@ -25,8 +25,7 @@ async function getPlayers(query) {
     .limit(viewLimit)
     .populate("rarity")
     .populate("nationality")
-    .populate("league")
-    .populate("club");
+    .populate("league");
 
   const total = await Player.countDocuments(filterConditions);
   return {
@@ -40,6 +39,14 @@ async function getPlayers(query) {
     },
     data: fetchResult,
   };
+}
+async function getPlayer(id) {
+  const fetchResult = await Player.findById(id)
+    .populate("rarity")
+    .populate("nationality")
+    .populate("league");
+
+  return fetchResult;
 }
 
 async function createPlayer(data) {
@@ -80,4 +87,10 @@ async function deletePlayer(id) {
   }
 }
 
-module.exports = { getPlayers, createPlayer, updatePlayer, deletePlayer };
+module.exports = {
+  getPlayers,
+  getPlayer,
+  createPlayer,
+  updatePlayer,
+  deletePlayer,
+};
