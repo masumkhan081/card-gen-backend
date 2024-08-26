@@ -41,12 +41,19 @@ async function getPlayers(query) {
   };
 }
 async function getPlayer(id) {
-  const fetchResult = await Player.findById(id)
-    .populate("rarity")
-    .populate("nationality")
-    .populate("league");
+  try {
+    console.log("on this id:" + id);
+    const fetchResult = await Player.findById(id)
+      .populate("rarity")
+      .populate("nationality")
+      .populate("league");
 
-  return fetchResult;
+    return fetchResult;
+  } catch (error) {
+    console.log("in catch");
+    return null;
+    return getErrorResponse({ error, what: operableEntities.player });
+  }
 }
 
 async function createPlayer(data) {

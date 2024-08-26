@@ -23,7 +23,7 @@ async function getPlayers(req, res) {
 }
 
 async function getPlayer(req, res) {
-  console.log("on this id:");
+  
   //
   const result = await playerService.getPlayer(req.params.id);
   //
