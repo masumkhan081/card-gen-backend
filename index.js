@@ -1,6 +1,6 @@
 ///* eslint-disable no-undef */
-const app = require("./app");
-const mongodbConnection = require("./config/mongodb");
+const app = require("./src/app");
+const mongodbConnection = require("./src/config/mongodb");
 //
 
 async function bootstrap() {
