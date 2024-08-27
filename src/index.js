@@ -6,7 +6,7 @@ const mongodbConnection = require("./config/mongodb");
 async function bootstrap() {
   //
   const PORT = process.env.PORT || 5000;
-  const server = app.listen(process.env.PORT, async () => {
+  const server = app.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);
     await mongodbConnection();
   });

@@ -13,7 +13,11 @@ const path = require("path");
 //
 const app = express();
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://vercel.com/masum-khans-projects/card-gen-frontend",
+  "https://card-gen-frontend.vercel.app",
+];
 app.use(
   cors({
     origin: function (origin, callback) {

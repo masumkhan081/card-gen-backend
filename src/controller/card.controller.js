@@ -38,6 +38,8 @@ async function createCard(req, res) {
     uploadCardImage(req, res, async (err) => {
       const cardName = req.body.cardName;
 
+      console.log("cn: " + cardName);
+
       if (err) {
         console.error(err);
         return res.status(500).json({ error: err });
@@ -62,6 +64,7 @@ async function createCard(req, res) {
           data: null,
         });
       } else {
+        console.log("else");
         const addResult = await Card.create({
           cardName,
           image: fileUrl,
