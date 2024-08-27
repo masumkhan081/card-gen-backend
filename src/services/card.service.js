@@ -74,6 +74,8 @@ async function getCards(query) {
     .skip(viewSkip)
     .limit(viewLimit);
 
+  console.log("got hit 2");
+
   const total = await Card.countDocuments(filterConditions);
   return {
     meta: {

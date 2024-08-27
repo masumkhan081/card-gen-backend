@@ -23,6 +23,7 @@ async function getCardsAll(req, res) {
 
 async function getCards(req, res) {
   //
+  console.log("got hit 1");
   const result = await cardService.getCards(req.query);
   //
   res.send({
