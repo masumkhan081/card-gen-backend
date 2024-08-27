@@ -23,7 +23,6 @@ async function getPlayers(req, res) {
 }
 
 async function getPlayer(req, res) {
-  
   //
   const result = await playerService.getPlayer(req.params.id);
   //
@@ -41,7 +40,6 @@ async function createPlayer(req, res) {
       //
       const {
         playerName,
-
         overall,
         rarity,
         nationality,
@@ -75,19 +73,6 @@ async function createPlayer(req, res) {
       const fileUrl = `${req.protocol}://${req.get(
         "host"
       )}/public/player-images/${req.file.filename}`;
-      //
-      // const existence = await Card.findOne({ playerName });
-
-      // if (existence) {
-      //   await unlinkAsync(req.file.path);
-
-      //   res.send({
-      //     statusCode: httpStatus[409],
-      //     success: false,
-      //     message: "A card already exist with this name",
-      //     data: null,
-      //   });
-      // } else {
 
       try {
         const addResult = await Player.create({
@@ -132,17 +117,101 @@ async function createPlayer(req, res) {
   } catch (err) {
     res.send(JSON.stringify(err));
   }
-
-  // const result = await playerService.createPlayer(req.body);
-  // res.send(result);
 }
 //
 async function updatePlayer(req, res) {
-  const result = await playerService.updatePlayer({
-    id: req.params.id,
-    data: req.body,
-  });
-  res.send(result);
+  try {
+    const updatePlayerId = req.params.id;
+    const updatablePlayer = await Player.findById(updatePlayerId);
+    let fileUrl;
+    console.log("updatablePlayer:  " + JSON.stringify(updatablePlayer));
+
+    uploadPlayerImage(req, res, async (err) => {
+      //
+      const {
+        playerName,
+        overall,
+        rarity,
+        nationality,
+        league,
+        foot,
+        skillMoves,
+        weakFoot,
+        atkWorkrate,
+        defWorkrate,
+        position,
+        playStyle,
+        altPosition,
+        pace,
+        dribbling,
+        pass,
+        shot,
+        defense,
+        physical,
+      } = req.body;
+
+      const arrPlayStyle = playStyle ? JSON.parse(playStyle) : [];
+      const arrAltPosition = altPosition ? JSON.parse(altPosition) : [];
+
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: err });
+      }
+      if (req.file) {
+        fileUrl = `${req.protocol}://${req.get("host")}/public/player-images/${
+          req.file.filename
+        }`;
+      }
+
+      try {
+        const updateResult = await Player.findByIdAndUpdate(
+          updatePlayerId,
+          {
+            playerName,
+            image: fileUrl ? fileUrl : updatablePlayer.image,
+            overall,
+            rarity,
+            nationality,
+            league,
+            foot,
+            skillMoves,
+            weakFoot,
+            atkWorkrate,
+            defWorkrate,
+            position,
+            playStyle: arrPlayStyle,
+            altPosition: arrAltPosition,
+            pace,
+            dribbling,
+            pass,
+            shot,
+            defense,
+            physical,
+          },
+          {
+            new: true,
+          }
+        );
+
+        res.send({
+          statusCode: httpStatus[200],
+          success: true,
+          message: "Player details updated successfully",
+          data: updateResult,
+        });
+      } catch (err) {
+        console.log(err);
+        res.send({
+          statusCode: httpStatus[400],
+          success: false,
+          message: "required fields are missing",
+          data: null,
+        });
+      }
+    });
+  } catch (err) {
+    res.send(JSON.stringify(err));
+  }
 }
 //
 async function deletePlayer(req, res) {
