@@ -29,23 +29,23 @@ const playerSchema = new Schema(
     },
     foot: {
       type: String,
-      enum: ["L", "R"],
+      enum: ["", "L", "R"],
     },
     skillMoves: {
       type: Number,
-      enum: [1, 2, 3, 4, 5],
+      enum: [0, 1, 2, 3, 4, 5],
     },
     weakFoot: {
       type: Number,
-      enum: [1, 2, 3, 4, 5],
+      enum: [0, 1, 2, 3, 4, 5],
     },
     atkWorkrate: {
       type: String,
-      enum: ["H", "M", "L"],
+      enum: ["", "H", "M", "L"],
     },
     defWorkrate: {
       type: String,
-      enum: ["H", "M", "L"],
+      enum: ["", "H", "M", "L"],
     },
     position: {
       type: String,
@@ -73,7 +73,7 @@ const playerSchema = new Schema(
     },
     physical: {
       type: Number,
-    }, 
+    },
   },
   {
     timestamps: true,
