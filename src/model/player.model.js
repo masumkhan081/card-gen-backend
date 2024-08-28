@@ -18,14 +18,17 @@ const playerSchema = new Schema(
     rarity: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "cards",
+      required: true,
     },
     nationality: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "countries",
+      required: true,
     },
     league: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "leagues",
+      required: true,
     },
     foot: {
       type: String,
