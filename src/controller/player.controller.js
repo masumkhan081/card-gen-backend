@@ -1,37 +1,42 @@
 const playerService = require("../services/player.service");
-const { success_msg, err_msg } = require("../util/responseHandler");
+const {
+  success_msg,
+  err_msg,
+  sendCreateResponse,
+  sendDeletionResponse,
+  sendErrorResponse,
+  sendFetchResponse,
+  sendUpdateResponse,
+} = require("../util/responseHandler");
 const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
 const { uploadPlayerImage } = require("../util/fileHandle");
 const Player = require("../model/player.model");
 const httpStatus = require("http-status");
+const { operableEntities } = require("../config/constants");
 const unlinkAsync = promisify(fs.unlink);
-
 //
 async function getPlayers(req, res) {
   //
   const result = await playerService.getPlayers(req.query);
   //
-  res.send({
-    statusCode: result.data.length > 0 ? 200 : 404,
-    success: result.data.length > 0 ? true : false,
-    message:
-      result.data.length > 0 ? success_msg.fetch("Players") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.players });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.players });
+  }
 }
 
 async function getPlayer(req, res) {
   //
   const result = await playerService.getPlayer(req.params.id);
   //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Player") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.players });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.players });
+  }
 }
 
 async function createPlayer(req, res) {
@@ -65,17 +70,18 @@ async function createPlayer(req, res) {
 
       if (err) {
         console.error(err);
-        return res.status(500).json({ error: err });
+        return res.json({ statusCode: 500, error: err });
       }
       if (!req.file) {
         return res.status(400).json({ error: "Please send player Image file" });
       }
+      //
       const fileUrl = `${req.protocol}://${req.get(
         "host"
       )}/public/player-images/${req.file.filename}`;
-
+      //
       try {
-        const addResult = await Player.create({
+        const newPlayer = new Player({
           playerName,
           image: fileUrl,
           overall: overall ? overall : 0,
@@ -94,37 +100,40 @@ async function createPlayer(req, res) {
           dribbling: dribbling ? dribbling : 0,
           pass: pass ? pass : 0,
           shot: shot ? shot : 0,
-          defense: defense ? defense :0,
+          defense: defense ? defense : 0,
           physical: physical ? physical : 0,
         });
 
-        res.send({
-          statusCode: httpStatus[201],
-          success: true,
-          message: "Player details saved successfully",
-          data: addResult,
-        });
-      } catch (err) {
-        console.log(err);
-        res.send({
-          statusCode: httpStatus[400],
-          success: false,
-          message: "required fields are missing",
-          data: null,
-        });
+        const addResult = await newPlayer.save();
+
+        if (addResult instanceof Error) {
+          sendErrorResponse({
+            res,
+            error: result,
+            what: operableEntities.card,
+          });
+        } else {
+          sendCreateResponse({
+            res,
+            what: operableEntities.player,
+            data: addResult,
+          });
+        }
+      } catch (error) {
+        await unlinkAsync(req.file.path);
+        sendErrorResponse({ res, error, what: operableEntities.player });
       }
     });
-  } catch (err) {
-    res.send(JSON.stringify(err));
+  } catch (error) {
+    sendErrorResponse({ res, error, what: operableEntities.player });
   }
 }
 //
 async function updatePlayer(req, res) {
   try {
     const updatePlayerId = req.params.id;
-    const updatablePlayer = await Player.findById(updatePlayerId);
     let fileUrl;
-    console.log("updatablePlayer:  " + JSON.stringify(updatablePlayer));
+    //
 
     uploadPlayerImage(req, res, async (err) => {
       //
@@ -193,30 +202,30 @@ async function updatePlayer(req, res) {
           }
         );
 
-        res.send({
-          statusCode: httpStatus[200],
-          success: true,
-          message: "Player details updated successfully",
+        sendCreateResponse({
+          res,
+          what: operableEntities.player,
           data: updateResult,
         });
-      } catch (err) {
-        console.log(err);
-        res.send({
-          statusCode: httpStatus[400],
-          success: false,
-          message: "required fields are missing",
-          data: null,
-        });
+        //
+      } catch (error) {
+        await unlinkAsync(req.file.path);
+        sendErrorResponse({ res, error, what: operableEntities.player });
       }
     });
-  } catch (err) {
-    res.send(JSON.stringify(err));
+  } catch (error) {
+    sendErrorResponse({ res, error, what: operableEntities.player });
   }
 }
 //
 async function deletePlayer(req, res) {
   const result = await playerService.deletePlayer(req.params.id);
-  res.send(result);
+  if (result instanceof Error) {
+    console.log("instance of err");
+    sendErrorResponse({ res, error: result, what: operableEntities.player });
+  } else {
+    sendDeletionResponse({ res, data: result, what: operableEntities.player });
+  }
 }
 
 module.exports = {

@@ -8,6 +8,7 @@ const playerSchema = new Schema(
     playerName: {
       type: String,
       required: true,
+      unique: true,
     },
     image: {
       type: String,

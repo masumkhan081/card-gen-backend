@@ -1,93 +1,76 @@
 const { operableEntities } = require("../config/constants");
 const Card = require("../model/card.model");
 const { getSearchAndPagination } = require("../util/pagination");
-const {
-  getCreateResponse,
-  getErrorResponse,
-  getDeletionResponse,
-  getUpdateResponse,
-} = require("../util/responseHandler");
 
 async function getCardsAll() {
-  const fetchResult = await Card.find().skip(0).limit(0);
-  const total = await Card.countDocuments();
-  return {
-    meta: {
-      total,
-    },
-    data: fetchResult,
-  };
-}
-
-async function createCard(data) {
   try {
-    console.log("reached here -2");
-    const addResult = await Card.create(data);
-    return getCreateResponse({
-      data: addResult,
-      what: operableEntities.club,
-    });
+    const fetchResult = await Card.find().skip(0).limit(0);
+    const total = await Card.countDocuments();
+    return {
+      meta: {
+        total,
+      },
+      data: fetchResult,
+    };
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.club });
+    return error;
   }
 }
 
 async function updateCard({ id, data }) {
-  try {
+  try { 
     const editResult = await Card.findByIdAndUpdate(id, data, {
       new: true,
     });
-    return getUpdateResponse({
-      data: editResult,
-      what: operableEntities.club,
-    });
+    return editResult;
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.club });
+    return error;
   }
 }
 //
 async function deleteCard(id) {
   try {
     const deleteResult = await Card.findByIdAndDelete(id);
-    return getDeletionResponse({
-      data: deleteResult,
-      what: operableEntities.club,
-    });
+    return deleteResult;
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.club });
+    return error;
   }
 }
 
 async function getCards(query) {
-  const {
-    currentPage,
-    viewLimit,
-    viewSkip,
-    sortBy,
-    sortOrder,
-    filterConditions,
-    sortConditions,
-  } = getSearchAndPagination({ query, what: operableEntities.Card });
-
-  const fetchResult = await Card.find(filterConditions)
-    .sort(sortConditions)
-    .skip(viewSkip)
-    .limit(viewLimit);
-
-  console.log("got hit 2");
-
-  const total = await Card.countDocuments(filterConditions);
-  return {
-    meta: {
-      total,
-      limit: viewLimit,
-      page: currentPage,
-      skip: viewSkip,
+  try {
+    const {
+      currentPage,
+      viewLimit,
+      viewSkip,
       sortBy,
       sortOrder,
-    },
-    data: fetchResult,
-  };
+      filterConditions,
+      sortConditions,
+    } = getSearchAndPagination({ query, what: operableEntities.Card });
+
+    const fetchResult = await Card.find(filterConditions)
+      .sort(sortConditions)
+      .skip(viewSkip)
+      .limit(viewLimit);
+
+    console.log("got hit 2");
+
+    const total = await Card.countDocuments(filterConditions);
+    return {
+      meta: {
+        total,
+        limit: viewLimit,
+        page: currentPage,
+        skip: viewSkip,
+        sortBy,
+        sortOrder,
+      },
+      data: fetchResult,
+    };
+  } catch (error) {
+    return error;
+  }
 }
 
-module.exports = { getCards, getCardsAll, createCard, deleteCard, updateCard };
+module.exports = { getCards, getCardsAll, deleteCard, updateCard };

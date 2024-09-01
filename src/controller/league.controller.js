@@ -1,11 +1,12 @@
 const leagueService = require("../services/league.service");
 const httpStatus = require("http-status");
-const { success_msg, err_msg } = require("../util/responseHandler");
+const { success_msg, err_msg, err_custom } = require("../util/responseHandler");
 const { uploadLeagueImage } = require("../util/fileHandle");
 const League = require("../model/league.model");
 const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
+const { operableEntities } = require("../config/constants");
 const unlinkAsync = promisify(fs.unlink);
 //
 
@@ -13,24 +14,21 @@ async function getLeaguesAll(req, res) {
   //
   const result = await leagueService.getLeaguesAll();
   //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Leagues") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.leagues });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.leagues });
+  }
 }
 
 async function getLeagues(req, res) {
   //
   const result = await leagueService.getLeagues(req.query);
-  //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Leagues") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.leagues });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.leagues });
+  }
 }
 
 async function createLeague(req, res) {
@@ -50,32 +48,26 @@ async function createLeague(req, res) {
         "host"
       )}/public/league-images/${req.file.filename}`;
       //
-      const existence = await League.findOne({ leagueName });
-
-      if (existence) {
-        await unlinkAsync(req.file.path);
-
-        res.send({
-          statusCode: httpStatus[409],
-          success: false,
-          message: "A league already exist ",
-          data: null,
-        });
-      } else {
+      try {
         const addResult = await League.create({
           leagueName,
           image: fileUrl,
         });
-        res.send({
-          statusCode: httpStatus[201],
-          success: true,
-          message: "League saved successfully",
+        sendCreateResponse({
+          res,
+          what: operableEntities.league,
           data: addResult,
+        });
+      } catch (error) {
+        await unlinkAsync(req.file.path);
+        sendErrorResponse({
+          error: err_custom.already_exist,
+          what: operableEntities.league,
         });
       }
     });
-  } catch (err) {
-    res.send(JSON.stringify(err));
+  } catch (error) {
+    sendErrorResponse({ res, error, what: operableEntities.league });
   }
 }
 //
@@ -84,12 +76,20 @@ async function updateLeague(req, res) {
     id: req.params.id,
     data: req.body,
   });
-  res.send(result);
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.league });
+  } else {
+    sendUpdateResponse({ res, data: result, what: operableEntities.league });
+  }
 }
 //
 async function deleteLeague(req, res) {
   const result = await leagueService.deleteLeague(req.params.id);
-  res.send(result);
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.league });
+  } else {
+    sendDeletionResponse({ res, data: result, what: operableEntities.league });
+  }
 }
 
 module.exports = {

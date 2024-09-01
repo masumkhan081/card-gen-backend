@@ -1,0 +1,29 @@
+{
+  "errors": {
+    "playerName": {
+      "name": "ValidatorError",
+      "message": "Path `playerName` is required.",
+      "properties": {
+        "message": "Path `playerName` is required.",
+        "type": "required",
+        "path": "playerName"
+      },
+      "kind": "required",
+      "path": "playerName"
+    },
+    "rarity": {
+      "name": "ValidatorError",
+      "message": "Path `rarity` is required.",
+      "properties": {
+        "message": "Path `rarity` is required.",
+        "type": "required",
+        "path": "rarity"
+      },
+      "kind": "required",
+      "path": "rarity"
+    }
+  },
+  "_message": "players validation failed",
+  "name": "ValidationError",
+  "message": "players validation failed: playerName: Path `playerName` is required., rarity: Path `rarity` is required."
+}

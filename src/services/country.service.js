@@ -7,59 +7,55 @@ const {
   getDeletionResponse,
   getUpdateResponse,
 } = require("../util/responseHandler");
-// 
+//
 
 async function getCountriesAll() {
-  const fetchResult = await Country.find().skip(0).limit(0);
-  const total = await Country.countDocuments();
-  return {
-    meta: {
-      total,
-    },
-    data: fetchResult,
-  };
+  try {
+    const fetchResult = await Country.find().skip(0).limit(0);
+    const total = await Country.countDocuments();
+    return {
+      meta: {
+        total,
+      },
+      data: fetchResult,
+    };
+  } catch (error) {
+    return error;
+  }
 }
-// 
+//
 
 async function getCountries(query) {
-  const {
-    currentPage,
-    viewLimit,
-    viewSkip,
-    sortBy,
-    sortOrder,
-    filterConditions,
-    sortConditions,
-  } = getSearchAndPagination({ query, what: operableEntities.country });
-
-  const fetchResult = await Country.find(filterConditions)
-    .sort(sortConditions)
-    .skip(viewSkip)
-    .limit(viewLimit);
-
-  const total = await Country.countDocuments(filterConditions);
-  return {
-    meta: {
-      total,
-      limit: viewLimit,
-      page: currentPage,
-      skip: viewSkip,
+  try {
+    const {
+      currentPage,
+      viewLimit,
+      viewSkip,
       sortBy,
       sortOrder,
-    },
-    data: fetchResult,
-  };
-}
+      filterConditions,
+      sortConditions,
+    } = getSearchAndPagination({ query, what: operableEntities.country });
 
-async function createCountry(data) {
-  try {
-    const addResult = await Country.create(data);
-    return getCreateResponse({
-      data: addResult,
-      what: operableEntities.country,
-    });
+    const fetchResult = await Country.find(filterConditions)
+      .sort(sortConditions)
+      .skip(viewSkip)
+      .limit(viewLimit);
+
+    const total = await Country.countDocuments(filterConditions);
+    return {
+      meta: {
+        total,
+        limit: viewLimit,
+        page: currentPage,
+        skip: viewSkip,
+        sortBy,
+        sortOrder,
+      },
+      data: fetchResult,
+    };
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.country });
+    return error;
   }
 }
 
@@ -68,25 +64,25 @@ async function updateCountry({ id, data }) {
     const editResult = await Country.findByIdAndUpdate(id, data, {
       new: true,
     });
-    return getUpdateResponse({
-      data: editResult,
-      what: operableEntities.country,
-    });
+    return editResult;
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.country });
+    return error;
   }
 }
 //
 async function deleteCountry(id) {
   try {
     const deleteResult = await Country.findByIdAndDelete(id);
-    return getDeletionResponse({
-      data: deleteResult,
-      what: operableEntities.country,
-    });
+    return deleteResult;
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.country });
+    return error;
   }
 }
 
-module.exports = { getCountries,getCountriesAll, createCountry, updateCountry, deleteCountry };
+module.exports = {
+  getCountries,
+  getCountriesAll,
+
+  updateCountry,
+  deleteCountry,
+};

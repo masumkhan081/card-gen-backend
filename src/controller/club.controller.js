@@ -1,11 +1,22 @@
 const clubService = require("../services/club.service");
 const httpStatus = require("http-status");
-const { success_msg, err_msg } = require("../util/responseHandler");
+const {
+  success_msg,
+  err_msg,
+
+  sendErrorResponse,
+  sendFetchResponse,
+  sendCreateResponse,
+  sendDeletionResponse,
+  sendUpdateResponse,
+  err_custom,
+} = require("../util/responseHandler");
 const { uploadClubImage } = require("../util/fileHandle");
 const Club = require("../model/club.model");
 const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
+const { operableEntities } = require("../config/constants");
 const unlinkAsync = promisify(fs.unlink);
 //
 
@@ -13,25 +24,21 @@ async function getClubsAll(req, res) {
   //
   const result = await clubService.getClubsAll();
   //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Clubs") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.clubs });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.clubs });
+  }
 }
-
 //
 async function getClubs(req, res) {
   //
   const result = await clubService.getClubs(req.query);
-  //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Clubs") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.clubs });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.clubs });
+  }
 }
 
 async function createClub(req, res) {
@@ -51,32 +58,26 @@ async function createClub(req, res) {
         "host"
       )}/public/club-images/${req.file.filename}`;
       //
-      const existence = await Club.findOne({ clubName });
-
-      if (existence) {
-        await unlinkAsync(req.file.path);
-
-        res.send({
-          statusCode: httpStatus[409],
-          success: false,
-          message: "A club already exist with this name",
-          data: null,
-        });
-      } else {
+      try {
         const addResult = await Club.create({
           clubName,
           image: fileUrl,
         });
-        res.send({
-          statusCode: httpStatus[201],
-          success: true,
-          message: "Club saved successfully",
+        sendCreateResponse({
+          res,
           data: addResult,
+          what: operableEntities.club,
+        });
+      } catch (error) {
+        await unlinkAsync(req.file.path);
+        sendErrorResponse({
+          error: err_custom.already_exist,
+          what: operableEntities.club,
         });
       }
     });
-  } catch (err) {
-    res.send(JSON.stringify(err));
+  } catch (error) {
+    sendErrorResponse({ res, error, what: operableEntities.club });
   }
 }
 //
@@ -85,12 +86,20 @@ async function updateClub(req, res) {
     id: req.params.id,
     data: req.body,
   });
-  res.send(result);
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.club });
+  } else {
+    sendUpdateResponse({ res, data: result, what: operableEntities.club });
+  }
 }
 //
 async function deleteClub(req, res) {
   const result = await clubService.deleteClub(req.params.id);
-  res.send(result);
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.club });
+  } else {
+    sendDeletionResponse({ res, data: result, what: operableEntities.club });
+  }
 }
 
 module.exports = {

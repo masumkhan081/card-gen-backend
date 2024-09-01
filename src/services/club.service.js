@@ -1,64 +1,55 @@
 const { operableEntities } = require("../config/constants");
 const Club = require("../model/club.model");
 const { getSearchAndPagination } = require("../util/pagination");
-const {
-  getCreateResponse,
-  getErrorResponse,
-  getDeletionResponse,
-  getUpdateResponse,
-} = require("../util/responseHandler");
-// 
+
+//
 
 async function getClubsAll() {
-  const fetchResult = await Club.find().skip(0).limit(0);
-  const total = await Club.countDocuments();
-  return {
-    meta: {
-      total,
-    },
-    data: fetchResult,
-  };
+  try {
+    const fetchResult = await Club.find().skip(0).limit(0);
+    const total = await Club.countDocuments();
+    return {
+      meta: {
+        total,
+      },
+      data: fetchResult,
+    };
+  } catch (error) {
+    return error;
+  }
 }
 
 async function getClubs(query) {
-  const {
-    currentPage,
-    viewLimit,
-    viewSkip,
-    sortBy,
-    sortOrder,
-    filterConditions,
-    sortConditions,
-  } = getSearchAndPagination({ query, what: operableEntities.Club });
-
-  const fetchResult = await Club.find(filterConditions)
-    .sort(sortConditions)
-    .skip(viewSkip)
-    .limit(viewLimit);
-
-  const total = await Club.countDocuments(filterConditions);
-  return {
-    meta: {
-      total,
-      limit: viewLimit,
-      page: currentPage,
-      skip: viewSkip,
+  try {
+    const {
+      currentPage,
+      viewLimit,
+      viewSkip,
       sortBy,
       sortOrder,
-    },
-    data: fetchResult,
-  };
-}
+      filterConditions,
+      sortConditions,
+    } = getSearchAndPagination({ query, what: operableEntities.Club });
 
-async function createClub(data) {
-  try {
-    const addResult = await Club.create(data);
-    return getCreateResponse({
-      data: addResult,
-      what: operableEntities.club,
-    });
+    const fetchResult = await Club.find(filterConditions)
+      .sort(sortConditions)
+      .skip(viewSkip)
+      .limit(viewLimit);
+
+    const total = await Club.countDocuments(filterConditions);
+    return {
+      meta: {
+        total,
+        limit: viewLimit,
+        page: currentPage,
+        skip: viewSkip,
+        sortBy,
+        sortOrder,
+      },
+      data: fetchResult,
+    };
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.club });
+    return error;
   }
 }
 
@@ -67,25 +58,19 @@ async function updateClub({ id, data }) {
     const editResult = await Club.findByIdAndUpdate(id, data, {
       new: true,
     });
-    return getUpdateResponse({
-      data: editResult,
-      what: operableEntities.club,
-    });
+    return editResult;
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.club });
+    return error;
   }
 }
 //
 async function deleteClub(id) {
   try {
     const deleteResult = await Club.findByIdAndDelete(id);
-    return getDeletionResponse({
-      data: deleteResult,
-      what: operableEntities.club,
-    });
+    return deleteResult;
   } catch (error) {
-    return getErrorResponse({ error, what: operableEntities.club });
+    return error;
   }
 }
 
-module.exports = { getClubs,getClubsAll, createClub, deleteClub, updateClub };
+module.exports = { getClubs, getClubsAll, deleteClub, updateClub };

@@ -1,36 +1,41 @@
 const countryService = require("../services/country.service");
 const httpStatus = require("http-status");
-const { success_msg, err_msg } = require("../util/responseHandler");
+const { success_msg, err_msg, err_custom } = require("../util/responseHandler");
 const Country = require("../model/country.model");
 const { uploadCountryImage } = require("../util/fileHandle");
 const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
+const { operableEntities } = require("../config/constants");
 const unlinkAsync = promisify(fs.unlink);
 //
 
 async function getCountriesAll(req, res) {
   //
   const result = await countryService.getCountriesAll();
-  //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Country") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    res.send(
+      getErrorResponse({ error: result, what: operableEntities.country })
+    );
+  } else {
+    res.send({
+      statusCode: result ? 200 : 404,
+      success: result ? true : false,
+      message: result ? success_msg.fetch("Countries") : err_msg.no_data,
+      data: result,
+    });
+  }
 }
 
 async function getCountries(req, res) {
   //
   const result = await countryService.getCountries(req.query);
   //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Countries") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.countries });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.countries });
+  }
 }
 //
 
@@ -52,34 +57,28 @@ async function createCountry(req, res) {
         "host"
       )}/public/country-images/${req.file.filename}`;
       //
-      const existence = await Country.findOne({ countryName });
 
-      console.log("existence: " + JSON.stringify(existence));
-
-      if (existence) {
-        await unlinkAsync(req.file.path);
-
-        res.send({
-          statusCode: httpStatus[409],
-          success: false,
-          message: "A country already exist with this name",
-          data: null,
-        });
-      } else {
+      try {
         const addResult = await Country.create({
           countryName,
           image: fileUrl,
         });
-        res.send({
-          statusCode: httpStatus[201],
-          success: true,
-          message: "Country saved successfully",
+
+        sendCreateResponse({
+          res,
+          what: operableEntities.country,
           data: addResult,
+        });
+      } catch (error) {
+        await unlinkAsync(req.file.path);
+        sendErrorResponse({
+          error: err_custom.already_exist,
+          what: operableEntities.country,
         });
       }
     });
-  } catch (err) {
-    res.send(JSON.stringify(err));
+  } catch (error) {
+    sendErrorResponse({ res, error, what: operableEntities.country });
   }
 }
 //
@@ -88,12 +87,20 @@ async function updateCountry(req, res) {
     id: req.params.id,
     data: req.body,
   });
-  res.send(result);
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.country });
+  } else {
+    sendUpdateResponse({ res, data: result, what: operableEntities.country });
+  }
 }
 //
 async function deleteCountry(req, res) {
   const result = await countryService.deleteCountry(req.params.id);
-  res.send(result);
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.country });
+  } else {
+    sendDeletionResponse({ res, data: result, what: operableEntities.country });
+  }
 }
 
 module.exports = {

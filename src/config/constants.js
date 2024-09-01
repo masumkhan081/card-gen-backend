@@ -2,6 +2,14 @@ const operableEntities = {
   country: "country",
   club: "club",
   player: "player",
+  card: "card",
+  league: "league",
+  // 
+  countries: "Countries",
+  clubs: "Clubs",
+  players: "Players",
+  cards: "Cards",
+  leagues: "Leagues"
 };
 
 const paginationFields = ["page", "limit", "sortBy", "sortOrder"];
@@ -13,7 +21,6 @@ const map_default_sort_by = {
   [operableEntities.club]: "name",
   [operableEntities.country]: "name",
   [operableEntities.player]: "name",
-  
 };
 
 const map_searchables = {
@@ -23,10 +30,10 @@ const map_searchables = {
 };
 
 module.exports = {
-      paginationFields,
-      defaultViewLimit,
-      map_searchables,
-      defaultSortOrder,
-      map_default_sort_by,
-      operableEntities, 
-    };
+  paginationFields,
+  defaultViewLimit,
+  map_searchables,
+  defaultSortOrder,
+  map_default_sort_by,
+  operableEntities,
+};

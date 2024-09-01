@@ -1,45 +1,48 @@
 const cardService = require("../services/card.service");
 const httpStatus = require("http-status");
-const { success_msg, err_msg } = require("../util/responseHandler");
+const {
+  success_msg,
+  err_msg,
+  sendCreateResponse,
+  sendDeletionResponse,
+  sendErrorResponse,
+  sendFetchResponse,
+  sendUpdateResponse,
+  err_custom,
+} = require("../util/responseHandler");
 const { uploadCardImage } = require("../util/fileHandle");
 const Card = require("../model/card.model");
 const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
+const { operableEntities } = require("../config/constants");
 const unlinkAsync = promisify(fs.unlink);
 //
 
 async function getCardsAll(req, res) {
   //
-  const result = await cardService.getCardsAll();
-  //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Cards") : err_msg.no_data,
-    data: result,
-  });
+  const result = await cardService.getCardsAll({ res: res });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.cards });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.cards });
+  }
 }
 
 async function getCards(req, res) {
   //
-  console.log("got hit 1");
   const result = await cardService.getCards(req.query);
-  //
-  res.send({
-    statusCode: result ? 200 : 404,
-    success: result ? true : false,
-    message: result ? success_msg.fetch("Clubs") : err_msg.no_data,
-    data: result,
-  });
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.cards });
+  } else {
+    sendFetchResponse({ res, data: result, what: operableEntities.cards });
+  }
 }
 
 async function createCard(req, res) {
   try {
     uploadCardImage(req, res, async (err) => {
       const cardName = req.body.cardName;
-
-      console.log("cn: " + cardName);
 
       if (err) {
         console.error(err);
@@ -52,48 +55,85 @@ async function createCard(req, res) {
       const fileUrl = `${req.protocol}://${req.get(
         "host"
       )}/public/card-images/${req.file.filename}`;
-      //
-      const existence = await Card.findOne({ cardName });
 
-      if (existence) {
-        await unlinkAsync(req.file.path);
+      // console.log("fileUrl------------ : " + req.file.path);
 
-        res.send({
-          statusCode: httpStatus[409],
-          success: false,
-          message: "A card already exist with this name",
-          data: null,
-        });
-      } else {
-        console.log("else");
+      try {
         const addResult = await Card.create({
           cardName,
           image: fileUrl,
         });
-        res.send({
-          statusCode: httpStatus[201],
-          success: true,
-          message: "Card saved successfully",
+        sendCreateResponse({
+          res,
+          what: operableEntities.card,
           data: addResult,
         });
+      } catch (error) {
+        await unlinkAsync(req.file.path);
+        sendErrorResponse({ res, error, what: operableEntities.card });
       }
     });
-  } catch (err) {
-    res.send(JSON.stringify(err));
+  } catch (error) {
+    sendErrorResponse({ res, error, what: operableEntities.card });
   }
 }
 //
 async function updateCard(req, res) {
-  const result = await cardService.updateCard({
-    id: req.params.id,
-    data: req.body,
-  });
-  res.send(result);
+  try {
+    const updateCardId = req.params.id;
+    let fileUrl;
+
+    uploadCardImage(req, res, async (err) => {
+      const cardName = req.body.cardName;
+      if (err) {
+        return res.status(500).json({ error: "error saving file" });
+      }
+      if (!req.file) {
+        return res.status(400).json({ error: "Please send card image" });
+      }
+
+      const fileUrl = `${req.protocol}://${req.get(
+        "host"
+      )}/public/card-images/${req.file.filename}`;
+
+      try {
+        const result = await cardService.updateCard({
+          id: updateCardId,
+          data: {
+            cardName,
+            image: fileUrl,
+          },
+        });
+        if (result instanceof Error) {
+          sendErrorResponse({
+            res,
+            error: result,
+            what: operableEntities.card,
+          });
+        } else {
+          sendUpdateResponse({
+            res,
+            data: result,
+            what: operableEntities.card,
+          });
+        }
+      } catch (error) {
+        await unlinkAsync(req.file.path);
+        sendErrorResponse({ res, error, what: operableEntities.card });
+      }
+    });
+  } catch (error) {
+    sendErrorResponse({ res, error, what: operableEntities.card });
+  }
 }
 //
 async function deleteCard(req, res) {
   const result = await cardService.deleteCard(req.params.id);
-  res.send(result);
+  if (result instanceof Error) {
+    sendErrorResponse({ res, error: result, what: operableEntities.card });
+  } else {
+    sendDeletionResponse({ res, data: result, what: operableEntities.card });
+  }
 }
 
 module.exports = {
